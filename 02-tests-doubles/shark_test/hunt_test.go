@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestHunt(t *testing.T) {
@@ -18,17 +19,13 @@ func TestHunt(t *testing.T) {
 	}
 
 	simu := simulator.NewCanSimulatorMockTestify()
-	expectedPosition := [2]float64{3.6, 5.2}
 
 	//Act
-	shar := shark.NewSharkDummy(simu)
-	simu.On("GetLinearDistance", expectedPosition).Return(2.4)
-	simu.On("CanCatch", 2.4, 144, 5).Return(true)
+	simu.On("GetLinearDistance", mock.Anything).Return(2.4)
+	simu.On("CanCatch", 2.4, 144.0, 5.0).Return(true)
 
-	err := shar.Hunt(presa)
-
-	/* sharneido := shark.CreateWhiteShark(simu)
-	err := sharneido.Hunt(presa) */
+	sharneido := shark.CreateWhiteShark(simu)
+	err := sharneido.Hunt(presa)
 
 	//Assert
 	assert.Empty(t, err)
