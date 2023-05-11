@@ -26,7 +26,7 @@ func (w *whiteShark) Hunt(prey prey.Prey) error {
 		fmt.Println("ñam ñam")
 		return nil
 	}
-	return fmt.Errorf("could not hunt the prey")
+	return ErrNotCatch
 }
 
 func CreateWhiteShark(simulator simulator.CatchSimulator) Shark {

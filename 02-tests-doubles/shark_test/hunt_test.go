@@ -11,25 +11,54 @@ import (
 )
 
 func TestHunt(t *testing.T) {
-	//Arrage
-	presa := prey.NewPreyStub()
-	presa.GetSpeedFn = func() (speedPrey float64) {
-		speedPrey = 5
-		return
-	}
 
-	simu := simulator.NewCanSimulatorMockTestify()
+	t.Run("ñam ñam", func(t *testing.T) {
+		// Arrage
+		presa := prey.NewPreyStub()
+		presa.GetSpeedFn = func() (speedPrey float64) {
+			speedPrey = 5
+			return
+		}
 
-	//Act
-	simu.On("GetLinearDistance", mock.Anything).Return(2.4)
-	simu.On("CanCatch", 2.4, 144.0, 5.0).Return(true)
+		simu := simulator.NewCanSimulatorMockTestify()
 
-	sharneido := shark.CreateWhiteShark(simu)
-	err := sharneido.Hunt(presa)
+		// Act
+		simu.On("GetLinearDistance", mock.Anything).Return(2.4)
+		simu.On("CanCatch", 2.4, 144.0, 5.0).Return(true)
 
-	//Assert
-	assert.Empty(t, err)
-	//AssertExpectations afirma que todo lo especificado con On y Return
-	//se llamó de hecho como se esperaba. Las llamadas pueden haber ocurrido en cualquier orden.
-	simu.AssertExpectations(t)
+		sharneido := shark.CreateWhiteShark(simu)
+		err := sharneido.Hunt(presa)
+
+		// Assert
+		assert.Empty(t, err)
+		// AssertExpectations afirma que todo lo especificado con On y Return
+		// se llamó de hecho como se esperaba. Las llamadas pueden haber ocurrido en cualquier orden.
+		simu.AssertExpectations(t)
+	})
+
+	t.Run("could not hunt the prey", func(t *testing.T) {
+		// Arrage
+		expectedError := shark.ErrNotCatch
+		presa := prey.NewPreyStub()
+		presa.GetSpeedFn = func() (speedPrey float64) {
+			speedPrey = 150
+			return
+		}
+
+		simu := simulator.NewCanSimulatorMockTestify()
+
+		// Act
+		simu.On("GetLinearDistance", mock.Anything).Return(2.4)
+		simu.On("CanCatch", 2.4, 144.0, 150.0).Return(false)
+
+		sharneido := shark.CreateWhiteShark(simu)
+		err := sharneido.Hunt(presa)
+
+		// Assert
+		assert.Error(t, err)
+		assert.EqualError(t, err, expectedError.Error())
+		// AssertExpectations afirma que todo lo especificado con On y Return
+		// se llamó de hecho como se esperaba. Las llamadas pueden haber ocurrido en cualquier orden.
+		simu.AssertExpectations(t)
+	})
 }
